@@ -1,6 +1,4 @@
 import streamlit as st
-import base64
-from PIL import Image
 
 # Declare a Streamlit component.
 # It will be served by the local webpack dev server that you can
@@ -17,6 +15,9 @@ MyComponent = st.declare_component(url="http://localhost:3001")
 # API, pre-process its input args, and post-process its output value.
 @MyComponent
 def create_instance(f, path, key=None):
+    import base64
+    from PIL import Image
+
     with open(path, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read())
         encoded_string = encoded_string.decode('utf-8')
