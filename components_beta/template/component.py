@@ -1,5 +1,6 @@
 import streamlit as st
 import base64
+from PIL import Image
 
 # Declare a Streamlit component.
 # It will be served by the local webpack dev server that you can
@@ -20,7 +21,10 @@ def create_instance(f, path, key=None):
         encoded_string = base64.b64encode(image_file.read())
         encoded_string = encoded_string.decode('utf-8')
 
-    return f(image=encoded_string, key=key, default=0)
+    with Image.open(path) as image_file:
+        width, height = image_file.size
+
+    return f(image=encoded_string, width=width, height=height, key=key, default={"x": 0, "y": 0})
 
 # Register the component. This assigns it a name within the Streamlit
 # namespace. "Declaration" and "registration" are separate steps:

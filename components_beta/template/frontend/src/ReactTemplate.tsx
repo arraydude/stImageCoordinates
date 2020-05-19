@@ -17,7 +17,7 @@ import "./streamlit.css"
  * called automatically when appropriate.
  */
 const ImageCoordinates = ({args}: ComponentProps): ReactElement => {
-    const {image} = args
+    const {image, width, height} = args
     const canvasRef: RefObject<HTMLCanvasElement> = React.createRef()
 
     const drawimage = () => {
@@ -54,9 +54,11 @@ const ImageCoordinates = ({args}: ComponentProps): ReactElement => {
         Streamlit.setComponentValue(coords)
     }
 
+    console.log("== args", args)
+
     return (
         <div>
-            <canvas ref={canvasRef} width={500} height={375} onClick={getCoords} />
+            <canvas ref={canvasRef} width={width} height={height} onClick={getCoords} />
         </div>
     )
 }
