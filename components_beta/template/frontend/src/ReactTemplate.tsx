@@ -1,4 +1,4 @@
-import React, {ReactElement, RefObject, useEffect} from "react"
+import React, {ReactElement, RefObject, MouseEvent, useEffect} from "react"
 import {
     withStreamlitConnection,
     Streamlit,
@@ -16,14 +16,14 @@ import "./streamlit.css"
  * you write your rendering logic in the render() function, which is
  * called automatically when appropriate.
  */
-const ImageCoordinates = ({args}: ComponentProps): ReactElement => {
+function ImageCoordinates({args}: ComponentProps): ReactElement {
     const {image, width, height} = args
     const canvasRef: RefObject<HTMLCanvasElement> = React.createRef()
 
-    const drawimage = () => {
+    useEffect(() => {
         const canvas = canvasRef.current
 
-        if (canvas) {
+        if (canvas && image) {
             const ctx = canvas.getContext("2d")
 
             const imageCanvas = new Image()
@@ -31,36 +31,29 @@ const ImageCoordinates = ({args}: ComponentProps): ReactElement => {
             imageCanvas.src = `data:image/png;base64, ${image}`
 
             imageCanvas.onload = function () {
-                // @ts-ignore
-                ctx.drawImage(imageCanvas, 0, 0);
+                ctx?.drawImage(imageCanvas, 0, 0);
             }
         }
-    }
 
-    useEffect(() => {
-        drawimage()
         Streamlit.setFrameHeight()
-    }, [image])
+    }, [canvasRef, image])
 
-    const getCoords = (e: any): void => {
-        // @ts-ignore
-        const rect = canvasRef.current.getBoundingClientRect();
+    function getCoords(e: MouseEvent<HTMLCanvasElement>) {
+        const { current } = canvasRef
 
-        const coords = {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+        if (current) {
+            const rect = current.getBoundingClientRect();
+
+            const coords = {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            }
+
+            Streamlit.setComponentValue(coords)
         }
-
-        Streamlit.setComponentValue(coords)
     }
 
-    console.log("== args", args)
-
-    return (
-        <div>
-            <canvas ref={canvasRef} width={width} height={height} onClick={getCoords} />
-        </div>
-    )
+    return <canvas ref={canvasRef} width={width} height={height} onClick={getCoords}/>
 }
 
 export default withStreamlitConnection(ImageCoordinates)
